@@ -23,6 +23,9 @@
 	line-height: 140%;
 	color: #C00033;
 }
+.ztA, .ztA *, .ztA *:before, .ztA *:after {
+  box-sizing: border-box;
+}
 .ztA hr {
 	border: 0;
 	border-top: 1px dashed #e8003e;
@@ -31,8 +34,9 @@
 	content: attr(data-a);
 }
 .ztA input, .ztA textarea {
-	font-family: monospace;
+	margin-top: -1px;
 	border: 1px solid #e8003e;
+	font-family: monospace;
 	color: black;
 }
 .ztA input:focus, .ztA textarea:focus {
@@ -46,20 +50,22 @@
 .ztA *[readonly], .ztA .result {
 	background-color: #FFEF81;
 }
+.ztA .useExtended {
+	float: right;
+	width: auto;
+	margin: 0;
+}
+	.ztA .useExtended svg {
+		margin: 0;
+	}
 .ztA input {
 	display: block;
 	width: 15rem;
 	padding: 0 .5rem;
-	/*margin: 0 0 0 1rem;*/
 	-webkit-border-radius: 0;
-	border-top-width: 0;
 	font-size: 1.2rem;
 	line-height: 160%;
-}
-.ztA input[type=checkbox] {
-	width: 2rem;
-	margin-right: 13rem;
-	padding: 0;
+	height: 2rem;
 }
 .ztA p {
 	width: 24rem;
@@ -70,13 +76,31 @@
 	width: 24rem;
 	text-align: right;
 	font-size: 1rem;
-	line-height: 1rem;
 	vertical-align: top;
 }
 	.ztA label input {
 		display: inline-block;
 		margin-left: 1rem;
 	}
+	.ztA label input[type=checkbox] {
+		display: none;
+	}
+		.ztA label svg {
+			display: inline-block;
+			width: 2rem;
+			height: 1.8rem;
+			padding: .2rem;
+			margin: 0 13rem 0 1rem;
+			cursor: pointer;
+
+			fill: #C00033;
+		}
+		.ztA label svg:before {
+			content: "a";
+		}
+		.ztA label input[type=checkbox]:checked+svg {
+			fill: #FFEF81;
+		}
 	.ztA .info {
 		position: relative;
 		display: inline-block;
@@ -88,6 +112,7 @@
 		font-size: .9rem;
 		line-height: 1rem;
 		text-align: center;
+		/*vertical-align: top;*/
 	}
 	.ztA .info:hover:after {
 		content: attr(data-title);
@@ -216,6 +241,7 @@
 		,mClose = createElement('command','right close',mWrap,handleCloseClick,String.fromCharCode(10005))
 		,mInput1 = createInput(mWrap)
 		,mInput2 = createInput(mWrap)
+		,mCheck = createInput(mWrap,bExtendedChars,calculatePassword,'','checkbox')
 		,mResult = createInput(mWrap)
 		,mStyle = createElement('style',u,document.head)
 		,mOld = document.querySelector(sClass)
@@ -236,6 +262,8 @@
 		mInput2.addEventListener('keyup',calculatePassword);
 		mResult.addEventListener('focus',handleResultClick);
 		mResult.classList.add('result');
+		mCheck.parentNode.classList.add('useExtended');
+		!bExtendedChars&&mWrap.removeChild(mCheck.parentNode);
 		//
 		if (sHostName===sNoHost) mWrap.classList.add(sNoHost);
 		//
@@ -288,8 +316,7 @@
 		mSeed = createInput(mWrap,iStartSeed,handleAdminChange,'seed');
 		mPasswordLength = createInput(mWrap,iPasswordLength,handleAdminChange,'length');
 
-		mExtendedChars = createInput(mWrap,u,handleAdminChange,'extended','checkbox');
-		mExtendedChars.checked = bExtendedChars;
+		mExtendedChars = createInput(mWrap,bExtendedChars,handleAdminChange,'extended','checkbox');
 
 		mExcludedChars = createInput(mWrap,sExclude,handleAdminChange,'exclude');
 
@@ -359,6 +386,8 @@
 			sInput2 = mInput2Content.value;
 			iPasswordLength = parseInt(mPasswordLength.value,10);
 			//
+			mCheck.checked = bExtendedChars;
+			//
 			sPrepareScript = sScript
 				.replace(/#ztA\{\}/g,sStyleSrc)
 				.replace(/seed:.*/,'seed:'+iStartSeed)
@@ -421,10 +450,6 @@
 		mResult.select();
 	}
 
-	function handleCheckbox(e){
-		mResult.type = mCheck.checked?'text':'password';
-	}
-
 	/**
 	 * Build the characterlist used to map characters
 	 */
@@ -472,13 +497,21 @@
 	 * @returns {HTMLElement}
 	 */
 	function createInput(parent,value,change,label,type){
-		var mLabel = label&&createElement('label',u,parent,u,label)
-			,mInput = createElement('input',u,label?mLabel:parent)
+		var bLabel = label!==u
+			,bCheck = type==='checkbox'
+			,mLabel = bLabel&&createElement('label',label.replace(/[^a-z]*/g,''),parent,u,label)
+			,mInput = createElement('input',u,bLabel?mLabel:parent)
 		;
-		if (value) mInput.value = value;
+		if (value&&!bCheck) mInput.value = value;
 		change&&mInput.addEventListener('keyup',change);
 		change&&mInput.addEventListener('change',change);
 		type&&mInput.setAttribute('type',type);
+		if (bCheck&&bLabel) {
+			mInput.checked = value;
+			var mHold = document.createElement('p');
+			mHold.innerHTML = '<svg viewBox="0 64 384 384" xml:space="preserve"><path d="M320,96L128,288l-64-64L0,288l128,128l256-256L320,96z"/></svg>';
+			mLabel.appendChild(mHold.querySelector('svg'));
+		}
 		return mInput;
 	}
 
@@ -508,6 +541,10 @@
 	 * Calculates the password.
 	 */
 	function calculatePassword(){
+			if (mCheck.checked!==bExtendedChars) {
+				bExtendedChars = mCheck.checked
+				setCharList();
+			}
 		var aInput1 = splitByLength(mInput1.value.toString().toLowerCase()).reverse()
 			,aInput2 = splitByLength(mInput2.value.toString().toLowerCase())
 			,sText = splitByLength(arrayFold(aInput1,aInput2),3).reverse().join('')
