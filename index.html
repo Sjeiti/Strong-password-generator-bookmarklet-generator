@@ -15,6 +15,7 @@
 	top: 1rem;
 	z-index: 2147483647;
 	padding: .3rem;
+	margin: 1rem;
 	background-color: #FF615F;
 	border: 1px solid #C00033;
 	box-shadow: 1px 3px 8px rgba(0,0,0,0.3);
@@ -23,12 +24,20 @@
 	line-height: 140%;
 	color: #C00033;
 }
+.ztA.nohost, .ztA.admin {
+	position: static;
+	clear: left;
+}
+.ztA.nohost {
+	float: left;
+}
 .ztA, .ztA *, .ztA *:before, .ztA *:after {
   box-sizing: border-box;
 }
 .ztA hr {
 	border: 0;
 	border-top: 1px dashed #e8003e;
+	margin: 1rem 0;
 }
 .ztA .data:before {
 	content: attr(data-a);
@@ -237,7 +246,7 @@
 		,sName = 'a'
 		,sClass = '.'+sName
 		,mBody = document.body
-		,mWrap = createElement(u,sName)
+		,mWrap = createElement(u,sName+' pagebooge')
 		,mClose = createElement('command','right close',mWrap,handleCloseClick,String.fromCharCode(10005))
 		,mInput1 = createInput(mWrap)
 		,mInput2 = createInput(mWrap)
@@ -269,7 +278,7 @@
 		//
 		initFields();
 		mScript&&initAdmin();
-		mBody.appendChild(mWrap);
+		mBody.insertBefore(mWrap,mBody.firstChild);
 	})();
 
 	/**
@@ -288,6 +297,7 @@
 	 */
 	function initAdmin() {
 		var minify = window.uglify?function(s){return uglify(s)}:function(s){return s;}
+			,mAdmin = createElement(u,sName+' admin pagebooge')
 			,sRunScript
 			,sBookmarklet
 			,mBookmarklet
@@ -310,18 +320,18 @@
 		;
 
 		sScript = mScript.textContent;
-		createElement('hr',u,mWrap);
-		createElement('p',u,mWrap,u,'Use the fields below to create your unique password generator bookmarklet (above). When you\'re done drag the [BOOKMARLET] button to your bookmarks bar.');
+		createElement('p',u,mAdmin,u,'Use the fields below to create your unique password generator bookmarklet (above). When you\'re done drag the [BOOKMARLET] button to your bookmarks bar.');
+		createElement('hr',u,mAdmin);
 
-		mSeed = createInput(mWrap,iStartSeed,handleAdminChange,'seed');
-		mPasswordLength = createInput(mWrap,iPasswordLength,handleAdminChange,'length');
+		mSeed = createInput(mAdmin,iStartSeed,handleAdminChange,'seed');
+		mPasswordLength = createInput(mAdmin,iPasswordLength,handleAdminChange,'length');
 
-		mExtendedChars = createInput(mWrap,bExtendedChars,handleAdminChange,'extended','checkbox');
+		mExtendedChars = createInput(mAdmin,bExtendedChars,handleAdminChange,'extended','checkbox');
 
-		mExcludedChars = createInput(mWrap,sExclude,handleAdminChange,'exclude');
+		mExcludedChars = createInput(mAdmin,sExclude,handleAdminChange,'exclude');
 
-		mInput1Content = createInput(mWrap,sInput1,handleAdminChange,'input 1');
-		mInput2Content = createInput(mWrap,sInput2,handleAdminChange,'input 2');
+		mInput1Content = createInput(mAdmin,sInput1,handleAdminChange,'input 1');
+		mInput2Content = createInput(mAdmin,sInput2,handleAdminChange,'input 2');
 
 		[[mSeed,'The seed for the random number generator is what makes your bookmarklet unique']
 			,[mPasswordLength,'The length of your generated password']
@@ -333,22 +343,23 @@
 			createElement('span','info',a[0].parentNode,u,'?').setAttribute('data-title',a[1]);
 		});
 		//
-		mBookmarklet = createElement('a','data bookmarklet',mWrap,handleBookmarkletClick,'x');
+		mTest = createElement('command','test',mAdmin,handleTestClick,'');
+		mTestResult = createElement('p','testresult',mAdmin,u,'...');
+		//
+		mBookmarklet = createElement('a','data bookmarklet',mAdmin,handleBookmarkletClick,'x');
 		mBookmarklet.setAttribute('data-a','bookmarklet');
 		mBookmarklet.setAttribute('title','Click to refresh, drag to bookmarksbar to use');
 		//
-		mTextarea = createElement('textarea',u,mWrap);
-		mTextarea.setAttribute('readonly','true');
-		//
-		mTest = createElement('command','test',mWrap,handleTestClick,'');
-		mTestResult = createElement('p','testresult',mWrap,u,'...');
+		mTextarea = createElement('textarea',u,mAdmin);
+		mTextarea.setAttribute('readonly','true');;
 		//
 		refreshAdmin();
+		mBody.appendChild(mAdmin);
 		/**
 		 * Handles click event on the bookmarklet in such a way that the bookmarklet can be tested while maintaining the admin interface (which is stripped from the bookmarklet itself).
 		 */
 		function handleBookmarkletClick(){
-			mBody.removeChild(mWrap);
+			mBody.removeChild(mAdmin);
 			mBookmarklet.setAttribute('href',sRunScript);
 			setTimeout(function(){
 				mBookmarklet.setAttribute('href',sBookmarklet);
