@@ -22,7 +22,6 @@
 	top: 1rem;
 	z-index: 2147483647;
 	padding: .3rem;
-	/*margin: 1rem;*/
 	transform: translateX(-50%);
 	-webkit-transform: translateX(-50%);
 	background-color: #FF615F;
@@ -56,20 +55,10 @@
 .ztA *[readonly], .ztA .result {
 	background-color: #FFEF81;
 }
-.ztA .useExtended {
-	float: right;
-	width: auto;
-	margin: 0;
-}
-	.ztA .useExtended input[type=checkbox] {
-		margin: 0;
-	}
-	.ztA .useExtended svg {
-		margin: 0;
-	}
 .ztA input {
 	display: block;
 	width: 15rem;
+	margin: -1px 2rem 0 0;
 	padding: 0 .5rem;
 	-webkit-border-radius: 0;
 	font-size: 1.2rem;
@@ -89,7 +78,6 @@
 		margin-left: 1rem;
 	}
 	.ztA label input[type=checkbox] {
-		ddisplay: none;
 		position: absolute;
 		top: 0;
 		right: 0;
@@ -109,46 +97,40 @@
 		}
 		.ztA label input[type=checkbox]:checked+svg {
 			fill: #FFEF81;
-  /*border: 5px solid #C00033;*/
 		}
-	.ztA .info {
-		position: relative;
-		display: inline-block;
-		width: 1rem;
-		height: 1rem;
-		margin-left: .5rem;
-		border-radius: 50%;
-		border: 1px solid #C00033;
-		font-size: .9rem;
-		line-height: 1rem;
-		text-align: center;
-		/*vertical-align: top;*/
-	}
-	.ztA .info:hover:after {
-		content: attr(data-title);
-		position: absolute;
-		left: 1rem;
-		top: 1rem;
-		width: 14rem;
-		padding: .5rem;
-		background-color: #FFEF81;
-		border: 1px solid dimgray;
-		color: black;
-		font-size: 1rem;
-		line-height: 140%;
-		text-align: left;
-	}
 .ztA .right {
 	float: right;
 }
-.ztA .close {
-	padding-left: .2rem;
+.ztA .close,
+.ztA .useExtended {
+	position: absolute;
+	right: .2rem;
+	width: 2rem;
+	height: 2rem;
 	font-size: 1.4rem;
-	line-height: 100%;
+	line-height: 2rem;
 	font-weight: bold;
 	cursor: pointer;
 	color: #C00033;
+	text-align: center;
 }
+.ztA .close {
+	top: .2rem;
+}
+.ztA .useExtended {
+	bottom: .2rem;
+	margin: 0;
+}
+	.ztA .useExtended input[type=checkbox],
+	.ztA .useExtended svg {
+		margin: 0;
+	}
+	.ztA .useExtended span:after {
+		content: "¶";
+	}
+	.ztA .useExtended input[type=checkbox]:checked+span {
+		color: #FFEF81;
+	}
 </style>
 <style>
 @import url(http://fonts.googleapis.com/css?family=Oswald);
@@ -181,28 +163,56 @@ body { bbackground-color: #000; }
 	box-shadow: none;
 	background-color: transparent;
 }
-	.spgbg aside {
-		position: absolute;
-		right: 0;
-		top: -2px;
-		transform-origin: 100% 0;
-		transform: rotate(-90deg);
-	}
-	.spgbg aside a {
-		background-color: #e8003e;
-		font-size: .8rem;
-		color: white;
-		text-decoration: none;
-		padding: .2rem .5rem;
-		white-space: nowrap;
-	}
-	.spgbg.admin p {
-		margin: 1rem 0;
-	}
+.spgbg aside {
+	position: absolute;
+	right: 0;
+	top: -2px;
+	transform-origin: 100% 0;
+	transform: rotate(-90deg);
+}
+.spgbg aside a {
+	background-color: #e8003e;
+	font-size: .8rem;
+	color: white;
+	text-decoration: none;
+	padding: .2rem .5rem;
+	white-space: nowrap;
+}
+.spgbg.admin p {
+	margin: 1rem 0;
+}
 .spgbg hr {
 	border: 0;
 	border-top: 1px dashed #e8003e;
 	margin: 1rem 0;
+}
+.spgbg.admin input {
+	margin-right: 0;
+}
+.spgbg .info {
+	position: relative;
+	display: inline-block;
+	width: 1rem;
+	height: 1rem;
+	margin-left: .5rem;
+	border-radius: 50%;
+	font-size: .9rem;
+	line-height: 1rem;
+	text-align: center;
+}
+.spgbg .info:hover:after {
+	content: attr(data-title);
+	position: absolute;
+	left: 1rem;
+	top: 1rem;
+	width: 14rem;
+	padding: .5rem;
+	background-color: #FFEF81;
+	border: 1px solid #e8003e;
+	color: black;
+	font-size: 1rem;
+	line-height: 140%;
+	text-align: left;
 }
 /*bookmarklet*/
 .spgbg .bookmarklet {
@@ -265,7 +275,7 @@ body { bbackground-color: #000; }
 	display: block;
 }
 </style>
-<script type="text/javascript" src="assets/uglify.js"></script>
+<script type="text/javascript" src="js/uglify.min.js"></script>
 <script class="ztB">
 (function(u){
 	var prng = (function rnd(){
@@ -299,6 +309,7 @@ body { bbackground-color: #000; }
 		,aCharMap = [u,[97,123]/*a to z*/,[65,91]/*A to Z*/,[97,123]/*a to z*/]
 		,sExclude = '\'"`´'
 		//
+		,iInput = 0
 		,sName = 'a'
 		,sClass = '.'+sName
 		,mBody = document.body
@@ -328,6 +339,9 @@ body { bbackground-color: #000; }
 		mResult.addEventListener('focus',handleResultClick);
 		mResult.classList.add('result');
 		mCheck.parentNode.classList.add('useExtended');
+//		mCheck.parentNode.querySelector('svg');
+		mCheck.parentNode.removeChild(mCheck.parentNode.querySelector('svg'));
+		createElement('span',u,mCheck.parentNode);
 		//!bExtendedChars&&mWrap.removeChild(mCheck.parentNode);
 		//
 		if (sHostName===sNoHost) mWrap.classList.add(sNoHost);
@@ -567,7 +581,6 @@ body { bbackground-color: #000; }
 	 * @param {string} type
 	 * @returns {HTMLElement}
 	 */
-	 var iInput = 0;
 	function createInput(parent,value,change,label,type){
 		var bLabel = label!==u
 			,bCheck = type==='checkbox'
