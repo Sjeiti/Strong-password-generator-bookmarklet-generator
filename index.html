@@ -69,6 +69,7 @@
 	position: relative;
 	display: block;
 	width: 24rem;
+	max-width: 100%;
 	text-align: right;
 	font-size: 1rem;
 	vertical-align: top;
@@ -135,8 +136,29 @@
 <style>
 @import url(http://fonts.googleapis.com/css?family=Oswald);
 html { font-size: 80%; bbackground-color: #000; }
-body { bbackground-color: #000; }
-/**/
+body { margin: 1rem 0; bbackground-color: #000; }
+/*bookmarklet*/
+.spgbg.bml {
+	position: relative;
+	top: 0;
+	/*left: 0;*/
+	display: inline-block;
+	/*transform: none;*/
+	/*-moz-transform: none;*/
+}
+/*admin*/
+.spgbg.admin {
+	position: relative;
+	left: 0;
+	top: 0;
+	margin: 3rem auto 0;
+	padding: 2rem;
+	max-width: 30rem;
+	transform: none;
+	-webkit-transform: none;
+	box-shadow: none;
+	background-color: transparent;
+}
 .spgbg h1 {
 	position: absolute;
 	left: -10%;
@@ -150,18 +172,6 @@ body { bbackground-color: #000; }
 	white-space: nowrap;
 	font-weight: normal;
 	text-align: center;
-}
-.spgbg.admin {
-	position: relative;
-	left: 0;
-	top: 0;
-	margin: 13rem auto 0;
-	padding: 2rem;
-	max-width: 30rem;
-	transform: none;
-	-webkit-transform: none;
-	box-shadow: none;
-	background-color: transparent;
 }
 .spgbg aside {
 	position: absolute;
@@ -188,6 +198,7 @@ body { bbackground-color: #000; }
 }
 .spgbg.admin input {
 	margin-right: 0;
+	max-width: 60%;
 }
 .spgbg .info {
 	position: relative;
@@ -274,6 +285,32 @@ body { bbackground-color: #000; }
 .spgbg.nohost textarea {
 	display: block;
 }
+/*mobile*/
+@media only screen and (max-device-width : 460px) {
+	.spgbg.admin {
+		margin-top: 6rem;
+		padding-top: 0;
+		border: 0;
+	}
+	.spgbg h1 {
+		left: 0;
+		top: -4rem;
+		width: 100%;
+		white-space: normal;
+	}
+	.spgbg aside {
+		transform-origin: 100% 100%;
+		top: -2rem;
+	}
+	.spgbg .info {
+		display: none;
+	}
+	.spgbg textarea {
+		display: block;
+		width: 100%;
+		margin-top: 2rem;
+	}
+}
 </style>
 <script type="text/javascript" src="js/uglify.min.js"></script>
 <script class="ztB">
@@ -313,7 +350,7 @@ body { bbackground-color: #000; }
 		,sName = 'a'
 		,sClass = '.'+sName
 		,mBody = document.body
-		,mWrap = createElement(u,sName+' spgbg')
+		,mWrap = createElement(u,sName+' spgbg bml')
 		,mClose = createElement('command','right close',mWrap,handleCloseClick,String.fromCharCode(10005))
 		,mInput1 = createInput(mWrap)
 		,mInput2 = createInput(mWrap)
